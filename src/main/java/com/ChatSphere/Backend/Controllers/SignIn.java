@@ -1,12 +1,8 @@
 package com.ChatSphere.Backend.Controllers;
 
-import com.ChatSphere.Backend.Dto.PasswordResetDto;
-import com.ChatSphere.Backend.Dto.SignInDto;
-import com.ChatSphere.Backend.Dto.UserDto;
-import com.ChatSphere.Backend.Services.CodeGeneratorService;
-import com.ChatSphere.Backend.Services.EmailService;
-import com.ChatSphere.Backend.Services.RedisService;
-import com.ChatSphere.Backend.Services.UserService;
+import com.ChatSphere.Backend.Dto.*;
+import com.ChatSphere.Backend.Services.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -74,15 +70,46 @@ public class SignIn {
         return ResponseEntity.status(HttpStatus.CREATED).body("Verification code sent successfully");
     }
 
-    @PostMapping("/password_reset")
-    public ResponseEntity<String> resetPassword(@RequestBody PasswordResetDto passwordResetDto) {
-        log.info("Resetting password for {} ", passwordResetDto.getEmail());
+    @PostMapping("/password/reset")
+    public ResponseEntity<String> handlePassword(@RequestBody Object passwordDto) {
+        log.info("Received request to handle password {}", passwordDto);  // Fixed typo: passwordDt -> passwordDto
 
-        boolean passwordChanged = userService.resetPassword(passwordResetDto);
+        // Convert the generic Object to a Map to check for properties
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map passwordMap = mapper.convertValue(passwordDto, Map.class);
 
-        if (passwordChanged) {
-            return new ResponseEntity<>("Password reset successfully", HttpStatus.CREATED);
+            // Check if it's PasswordResetDto based on its properties
+            if (passwordMap.containsKey("email") && passwordMap.containsKey("password")) {
+                PasswordResetDto passwordResetDto = mapper.convertValue(passwordDto, PasswordResetDto.class);
+                log.info("Resetting password for {}", passwordResetDto.getEmail());
+                boolean passwordChanged = userService.resetPassword(passwordResetDto);
+
+                if (passwordChanged) {
+                    return new ResponseEntity<>("Password reset successfully", HttpStatus.CREATED);
+                }
+                return new ResponseEntity<>("Error resetting password", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Check if it's UpdatePasswordDto based on its properties
+            else if (passwordMap.containsKey("currentPassword") && passwordMap.containsKey("newPassword")) {
+                UpdatePasswordDto updatePasswordDto = mapper.convertValue(passwordDto, UpdatePasswordDto.class);
+                log.info("Received request to update password for {}", updatePasswordDto.getEmail());
+                boolean passwordChanged = userService.resetPassword(updatePasswordDto);
+
+                if (passwordChanged) {
+                    return new ResponseEntity<>("Password updated successfully", HttpStatus.CREATED);
+                }
+                return new ResponseEntity<>("Incorrect password provided", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new ResponseEntity<>("Invalid request", HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            log.error("Error converting request payload", e);
+            return new ResponseEntity<>("Invalid request format", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Error resetting password", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+
 }
