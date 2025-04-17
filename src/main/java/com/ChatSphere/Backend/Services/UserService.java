@@ -8,6 +8,7 @@ import com.ChatSphere.Backend.Exceptions.OAuthSignInRequiredException;
 import com.ChatSphere.Backend.Mappers.ModelMapper;
 import com.ChatSphere.Backend.Model.User;
 import com.ChatSphere.Backend.Repositories.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,7 @@ public class UserService {
     private final PasswordService passwordService;
     private final ModelMapper modelMapper;
     private final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private final RedisService redisService;
 
     public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) {
         findByEmail(signUpRequest.getEmail()).ifPresent(user -> {
@@ -74,25 +76,56 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public boolean resetPassword(PasswordResetDto passwordResetDto) {
-        Optional<User> optionalUser = findByEmail(passwordResetDto.getEmail());
+    public boolean resetPassword(Object genericObject) {
         User user = null;
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
+
+        try {
+            // Try to convert to appropriate DTO first
+            ObjectMapper mapper = new ObjectMapper();
+            Map dataMap = mapper.convertValue(genericObject, Map.class);
+
+            Object convertedObject;
+            if (dataMap.containsKey("email") && dataMap.containsKey("password")) {
+                convertedObject = mapper.convertValue(genericObject, PasswordResetDto.class);
+            } else if (dataMap.containsKey("email") && dataMap.containsKey("currentPassword") &&
+                    dataMap.containsKey("newPassword")) {
+                convertedObject = mapper.convertValue(genericObject, UpdatePasswordDto.class);
+            } else {
+                return false;
+            }
+
+            if (convertedObject instanceof PasswordResetDto passwordResetDto) {
+                Optional<User> optionalUser = findByEmail(passwordResetDto.getEmail());
+                if (optionalUser.isEmpty()) return false;
+
+                user = optionalUser.get();
+                String rawPassword = passwordResetDto.getPassword();
+                String hashedPassword = passwordService.hashPassword(rawPassword);
+
+                user.setPassword(hashedPassword);
+                userRepository.save(user);
+                return true;
+            } else if (convertedObject instanceof UpdatePasswordDto updatePasswordDto) {
+                Optional<User> optionalUser = findByEmail(updatePasswordDto.getEmail());
+                if (optionalUser.isEmpty()) return false;
+
+                user = optionalUser.get();
+                boolean isPasswordCorrect = passwordService.verifyPassword(
+                        updatePasswordDto.getCurrentPassword(), user.getPassword());
+                if (!isPasswordCorrect) {
+                    return false;
+                }
+
+                String hashedNewPassword = passwordService.hashPassword(updatePasswordDto.getNewPassword());
+                user.setPassword(hashedNewPassword);
+                userRepository.save(user);
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("Error processing password reset/update", e);
         }
-        if (user == null) return false;
 
-        String rawPassword = passwordResetDto.getPassword();
-        String hashedPassword = passwordService.hashPassword(rawPassword);
-
-        user.setPassword(hashedPassword);
-        userRepository.save(user);
-
-        return true;
-    }
-
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+        return false;
     }
 
     public void deleteUserById(String email) {
