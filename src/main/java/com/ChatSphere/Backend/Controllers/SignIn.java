@@ -1,0 +1,88 @@
+package com.ChatSphere.Backend.Controllers;
+
+import com.ChatSphere.Backend.Dto.PasswordResetDto;
+import com.ChatSphere.Backend.Dto.SignInDto;
+import com.ChatSphere.Backend.Dto.UserDto;
+import com.ChatSphere.Backend.Services.CodeGeneratorService;
+import com.ChatSphere.Backend.Services.EmailService;
+import com.ChatSphere.Backend.Services.RedisService;
+import com.ChatSphere.Backend.Services.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/auth")
+@RequiredArgsConstructor
+@Slf4j
+public class SignIn {
+    private final UserService userService;
+    private final CodeGeneratorService codeGeneratorService;
+    private final EmailService emailService;
+    private final RedisService redisService;
+
+    @PostMapping("signin/email")
+    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto) {
+        log.info("Received request for {} to sign in", signInDto.getEmail());
+        UserDto userDto = userService.signInWithEmail(signInDto);
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", userDto);
+        response.put("message", "Login Successful");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) {
+        log.info("Received request to verify code {} for {}", code, email);
+        String cacheVerificationCode = redisService.getVerificationCodeFromCache(email);
+
+        if (cacheVerificationCode == null) {
+            return new ResponseEntity<>("Code expired, request a new one", HttpStatus.GONE);
+        }
+
+        if (cacheVerificationCode.equals(code)) {
+            return new ResponseEntity<>("Verification code verified, reset password", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("Wrong verification code", HttpStatus.CONFLICT);
+    }
+
+
+    @GetMapping("/email_lookup/generate_code")
+    public ResponseEntity<String> generateCode(@RequestParam String email) {
+        log.info("Received request to generate code for: {}", email);
+
+        if (!userService.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
+        }
+        String code = codeGeneratorService.generateCode();
+
+
+        if (!emailService.sendVerificationEmail(email, code)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send verification code");
+        }
+
+        if (!redisService.addVerificationCodeToCache(email, code)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to store code in cache");
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Verification code sent successfully");
+    }
+
+    @PostMapping("/password_reset")
+    public ResponseEntity<String> resetPassword(@RequestBody PasswordResetDto passwordResetDto) {
+        log.info("Resetting password for {} ", passwordResetDto.getEmail());
+
+        boolean passwordChanged = userService.resetPassword(passwordResetDto);
+
+        if (passwordChanged) {
+            return new ResponseEntity<>("Password reset successfully", HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>("Error resetting password", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
