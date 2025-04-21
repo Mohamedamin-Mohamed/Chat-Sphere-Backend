@@ -3,7 +3,7 @@ package com.ChatSphere.Backend.Dto;
 import lombok.Data;
 
 @Data
-public class TwilioVerifyDto {
+public class TwilioSendPinDto {
     private String email;
     private String phoneNumber;
 }
