@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class UserService {
     private final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final RedisService redisService;
 
-    public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) {
+    public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) throws ParseException {
         findByEmail(signUpRequest.getEmail()).ifPresent(user -> {
             throw new EmailAlreadyExistsException("Account already exists");
         });
@@ -41,7 +42,7 @@ public class UserService {
         return modelMapper.map(user);
     }
 
-    public UserDto signUpWithOauth(OAuthSignUpRequestDto oAuthSignUpRequest) {
+    public UserDto signUpWithOauth(OAuthSignUpRequestDto oAuthSignUpRequest) throws ParseException {
         findByEmail(oAuthSignUpRequest.getEmail()).ifPresent(user -> {
             throw new EmailAlreadyExistsException(String.format("Account exists sign in with %s provider", user.getOauthProvider()));
         });
@@ -52,7 +53,7 @@ public class UserService {
         return modelMapper.map(user);
     }
 
-    public UserDto signInWithEmail(SignInDto signInDto) {
+    public UserDto signInWithEmail(SignInDto signInDto) throws ParseException {
         User user = findByEmail(signInDto.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
@@ -64,7 +65,6 @@ public class UserService {
         if (!passwordService.verifyPassword(signInDto.getPassword(), user.getPassword())) {
             throw new IncorrectPasswordException("Incorrect password");
         }
-
         return modelMapper.map(user);
     }
 
@@ -131,5 +131,46 @@ public class UserService {
     public void deleteUserById(String email) {
         Optional<User> user = findByEmail(email);
         user.ifPresent(userRepository::delete);
+    }
+
+    public UserDto updateProfile(UpdateProfileDto updateProfileDto) throws ParseException {
+        User user = findByEmail(updateProfileDto.getEmail())
+                .orElseThrow(() -> new EmailNotFoundException("Email not found"));
+
+        // Check if email is being changed
+        String currentEmail = user.getEmail();
+        String newEmail = updateProfileDto.getNewEmail();
+
+        if (newEmail != null && !newEmail.isEmpty() && !currentEmail.equals(newEmail)) {
+            // Check if the new email is already taken by another user
+            findByEmail(newEmail).ifPresent(existingUser -> {
+                if (existingUser.getId() != user.getId()) {
+                    throw new EmailAlreadyExistsException("Email already in use.");
+                }
+            });
+
+            user.setEmail(newEmail);
+        }
+
+        if (updateProfileDto.getName() != null) {
+            user.setName(updateProfileDto.getName());
+        }
+
+        if (updateProfileDto.getBio() != null) {
+            user.setBio(updateProfileDto.getBio());
+        }
+
+        if (updateProfileDto.getProfileImage() != null) {
+            //in here implement s3 file upload logic and store the public url
+            user.setPicture(updateProfileDto.getProfileImage());
+        }
+
+        if (updateProfileDto.getPhoneNumber() != null) {
+            user.setPhoneNumber(updateProfileDto.getPhoneNumber());
+        }
+
+        userRepository.save(user);
+
+        return modelMapper.map(user);
     }
 }
