@@ -1,7 +1,13 @@
 package com.ChatSphere.Backend.Controllers;
 
-import com.ChatSphere.Backend.Dto.*;
-import com.ChatSphere.Backend.Services.*;
+import com.ChatSphere.Backend.Dto.PasswordResetDto;
+import com.ChatSphere.Backend.Dto.SignInDto;
+import com.ChatSphere.Backend.Dto.UpdatePasswordDto;
+import com.ChatSphere.Backend.Dto.UserDto;
+import com.ChatSphere.Backend.Services.CodeGeneratorService;
+import com.ChatSphere.Backend.Services.EmailService;
+import com.ChatSphere.Backend.Services.RedisService;
+import com.ChatSphere.Backend.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +30,7 @@ public class SignIn {
     private final RedisService redisService;
 
     @PostMapping("signin/email")
-    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto) {
+    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto) throws ParseException {
         log.info("Received request for {} to sign in", signInDto.getEmail());
         UserDto userDto = userService.signInWithEmail(signInDto);
         Map<String, Object> response = new HashMap<>();
@@ -72,7 +79,7 @@ public class SignIn {
 
     @PostMapping("/password/reset")
     public ResponseEntity<String> handlePassword(@RequestBody Object passwordDto) {
-        log.info("Received request to handle password {}", passwordDto);  // Fixed typo: passwordDt -> passwordDto
+        log.info("Received request to handle password {}", passwordDto);
 
         // Convert the generic Object to a Map to check for properties
         try {
@@ -110,6 +117,8 @@ public class SignIn {
         }
     }
 
-
-
+    @GetMapping("/test")
+    public String test() {
+        return "Hey there all is fine";
+    }
 }
