@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/auth/signup")
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class SignUp {
     private final UserService userService;
 
     @PostMapping("/email")
-    public ResponseEntity<String> signUpWithEmail(@RequestBody SignUpRequestDto signUpRequest) {
+    public ResponseEntity<String> signUpWithEmail(@RequestBody SignUpRequestDto signUpRequest) throws ParseException {
         log.info("Received request for {} to sign up with email", signUpRequest.getEmail());
         UserDto userDto = userService.signUpWithEmail(signUpRequest);
         System.out.println("User dto is " + userDto);
@@ -33,7 +35,7 @@ public class SignUp {
     }
 
     @PostMapping("/oauth")
-    public ResponseEntity<String> signUpWithOauth(@RequestBody OAuthSignUpRequestDto oAuthSignUpRequest) {
+    public ResponseEntity<String> signUpWithOauth(@RequestBody OAuthSignUpRequestDto oAuthSignUpRequest) throws ParseException {
         log.info("Received request for {} to sign up with oauth provider {}", oAuthSignUpRequest.getEmail(), oAuthSignUpRequest.getOauthProvider());
         UserDto userDto = userService.signUpWithOauth(oAuthSignUpRequest);
 
