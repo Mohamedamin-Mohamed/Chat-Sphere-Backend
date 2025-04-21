@@ -12,29 +12,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/profile")
 @Slf4j
-public class ProfileController {
+public class Profile {
 
     private final UserService userService;
 
-    public ProfileController(UserService userService) {
+    public Profile(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateProfile(@RequestBody @Valid UpdateProfileDto updateProfileDto) {
+    public ResponseEntity<Object> updateProfile(@RequestBody @Valid UpdateProfileDto updateProfileDto) throws ParseException {
         log.info("Updating profile for {}: ", updateProfileDto.getEmail());
 
         UserDto userDto = userService.updateProfile(updateProfileDto);
+        boolean profileUpdated = userDto != null;
         Map<String, Object> response = new HashMap<>();
         response.put("user", userDto);
-        response.put("message", "Profile has been updated successfully");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        response.put("message", profileUpdated ? "Profile has been updated successfully" : "Profile update failed");
+        System.out.println(response);
+        return new ResponseEntity<>(response, profileUpdated ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 
