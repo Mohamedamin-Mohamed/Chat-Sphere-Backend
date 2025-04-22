@@ -6,5 +6,5 @@ import lombok.Data;
 public class TwilioVerifyPinDto {
     private String email;
     private String phoneNumber;
-    private String code;
+    private String pin;
 }

@@ -1,6 +1,7 @@
 package com.ChatSphere.Backend.Controllers;
 
 import com.ChatSphere.Backend.Dto.ApiResponseDto;
+import com.ChatSphere.Backend.Dto.SendCodeResultDto;
 import com.ChatSphere.Backend.Dto.TwilioSendPinDto;
 import com.ChatSphere.Backend.Dto.TwilioVerifyPinDto;
 import com.ChatSphere.Backend.Services.TwilioService;
@@ -24,29 +25,29 @@ public class TwilioVerification {
     public ResponseEntity<ApiResponseDto> codeSending(@RequestBody TwilioSendPinDto sendPinDto) {
         log.info("Sending code for phone number: {}", sendPinDto.getPhoneNumber());
 
-        boolean codeSent = twilioService.sendCode(sendPinDto);
+        SendCodeResultDto result = twilioService.sendCode(sendPinDto);
 
-        if (codeSent) {
-            ApiResponseDto successResponse = new ApiResponseDto(true, "Code sent successfully", null);
-            return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
+        if (result.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto(true, result.getMessage(), null));
         }
-
-        ApiResponseDto errorResponse = new ApiResponseDto(false, "Something went wrong", null);
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto(false, result.getMessage(), null));
     }
 
     @PostMapping("/verify")
     public ResponseEntity<ApiResponseDto> codeVerification(@RequestBody TwilioVerifyPinDto verifyPinDto) {
-        log.info("Verifying code for phone number: {}", verifyPinDto.getPhoneNumber());
+        log.info("Verifying pin");
+
         boolean codeVerified = twilioService.verifyCode(verifyPinDto);
 
         if (codeVerified) {
-            ApiResponseDto successResponse = new ApiResponseDto(true, "Code is valid", null);
+            log.info("Verified");
+            ApiResponseDto successResponse = new ApiResponseDto(true, "Pin verified", null);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);
-
-
         }
-        ApiResponseDto errorResponse = new ApiResponseDto(false, "Code not valid", null);
+
+        log.warn("Verification failed");
+        ApiResponseDto errorResponse = new ApiResponseDto(false, "Invalid pin", null);
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
+
 }
