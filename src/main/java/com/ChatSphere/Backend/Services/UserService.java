@@ -42,10 +42,15 @@ public class UserService {
         return modelMapper.map(user);
     }
 
-    public UserDto signUpWithOauth(OAuthSignUpRequestDto oAuthSignUpRequest) throws ParseException {
-        findByEmail(oAuthSignUpRequest.getEmail()).ifPresent(user -> {
-            throw new EmailAlreadyExistsException(String.format("Account exists sign in with %s provider", user.getOauthProvider()));
-        });
+    public UserDto signUpWithOauth(OAuthSignUpRequestDto oAuthSignUpRequest) {
+        Optional<User> existingUser = findByEmail(oAuthSignUpRequest.getEmail());
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            if (user.getOauthProvider() == null || !user.getOauthProvider().equals(oAuthSignUpRequest.getOauthProvider())) {
+                throw new EmailAlreadyExistsException("Email already registered");
+            }
+            return modelMapper.map(user);
+        }
 
         User user = modelMapper.map(oAuthSignUpRequest);
         userRepository.save(user);
@@ -53,7 +58,7 @@ public class UserService {
         return modelMapper.map(user);
     }
 
-    public UserDto signInWithEmail(SignInDto signInDto) throws ParseException {
+    public UserDto signInWithEmail(SignInDto signInDto) {
         User user = findByEmail(signInDto.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
@@ -70,6 +75,10 @@ public class UserService {
 
     public Optional<User> findByEmail(String email) {
         return Optional.ofNullable(userRepository.findByEmail(email));
+    }
+
+    public User findByOauthId(String oauthId) {
+        return userRepository.findByOauthId(oauthId);
     }
 
     public boolean existsByEmail(String email) {
@@ -133,7 +142,7 @@ public class UserService {
         user.ifPresent(userRepository::delete);
     }
 
-    public UserDto updateProfile(UpdateProfileDto updateProfileDto) throws ParseException {
+    public UserDto updateProfile(UpdateProfileDto updateProfileDto) {
         User user = findByEmail(updateProfileDto.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
