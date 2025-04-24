@@ -2,14 +2,12 @@ package com.ChatSphere.Backend.Mappers;
 
 import com.ChatSphere.Backend.Dto.OAuthSignUpRequestDto;
 import com.ChatSphere.Backend.Dto.SignUpRequestDto;
-import com.ChatSphere.Backend.Dto.UpdateProfileDto;
 import com.ChatSphere.Backend.Dto.UserDto;
 import com.ChatSphere.Backend.Model.User;
 import com.ChatSphere.Backend.Services.PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -40,7 +38,7 @@ public class ModelMapper {
         return user;
     }
 
-    public UserDto map(User user) throws ParseException {
+    public UserDto map(User user) {
         UserDto userDto = new UserDto();
         userDto.setEmail(user.getEmail());
         userDto.setName(user.getName());
