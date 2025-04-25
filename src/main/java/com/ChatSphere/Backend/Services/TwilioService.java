@@ -17,15 +17,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class TwilioService {
+    @Value("${twilio.STATUS_PENDING}")
+    private String STATUS_PENDING;
 
-    private static final String STATUS_PENDING = "pending";
-    private static final String STATUS_APPROVED = "approved";
+    @Value("${twilio.STATUS_APPROVED}")
+    private String STATUS_APPROVED;
+
+    @Value("${twilio.VERIFICATION_SID}")
+    private String SERVICE_ID;
 
     private final TwilioConfig twilioConfig;
     private final UserService userService;
 
-    @Value("${twilio.VERIFICATION_SID}")
-    private String serviceId;
 
     public SendCodeResultDto sendCode(TwilioSendPinDto sendPinDto) {
         try {
@@ -38,7 +41,7 @@ public class TwilioService {
 
             if (number != null) {
                 Verification verification = Verification
-                        .creator(serviceId, phoneNum, "sms")
+                        .creator(SERVICE_ID, phoneNum, "sms")
                         .create();
 
                 boolean isPending = STATUS_PENDING.equals(verification.getStatus());
@@ -56,7 +59,7 @@ public class TwilioService {
         try {
             twilioConfig.connect();
 
-            VerificationCheck verificationCheck = VerificationCheck.creator(serviceId, verifyPinDto.getPin())
+            VerificationCheck verificationCheck = VerificationCheck.creator(SERVICE_ID, verifyPinDto.getPin())
                     .setTo(verifyPinDto.getPhoneNumber())
                     .create();
 
