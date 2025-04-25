@@ -45,4 +45,5 @@ public class User {
     private String authorizationCode;
     private String bio;
     private String phoneNumber;
+    private String identityToken;
 }
