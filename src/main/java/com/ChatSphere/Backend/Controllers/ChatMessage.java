@@ -28,8 +28,8 @@ public class ChatMessage {
 
     @GetMapping("/messages")
     public ResponseEntity<List<Message>> loadMessages() {
-        List<com.ChatSphere.Backend.Model.Message> messages = messageService.loadMessages();
-        if(messages != null){
+        List<Message> messages = messageService.loadMessages();
+        if (messages != null) {
             return new ResponseEntity<>(messages, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
