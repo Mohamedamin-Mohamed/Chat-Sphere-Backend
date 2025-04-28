@@ -24,7 +24,7 @@ public class User {
         this.createdAt = Instant.now();
     }
 
-    @Column(name = "fullName")
+    @Column(name = "full_name")
     private String name;
 
     @Column(unique = true)
@@ -40,9 +40,10 @@ public class User {
 
     private boolean emailVerified;
 
-    @Column(name = "pictureUrl")
+    @Column(name = "picture_url")
     private String picture;
     private String authorizationCode;
     private String bio;
     private String phoneNumber;
+    private String identityToken;
 }

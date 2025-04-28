@@ -11,4 +11,5 @@ public class OAuthSignUpRequestDto {
     private boolean emailVerified;
     private String picture;
     private String authorizationCode;
+    private String identityToken;
 }

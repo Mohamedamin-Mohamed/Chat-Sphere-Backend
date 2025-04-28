@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TwilioConfig {
-    @Value("${twilio.ACCOUNT_SID}")
+    @Value("${twilio.accountSID}")
     String ACCOUNT_SID;
 
-    @Value("${twilio.AUTH_TOKEN}")
+    @Value("${twilio.authToken}")
     String AUTH_TOKEN;
 
     public void connect() {

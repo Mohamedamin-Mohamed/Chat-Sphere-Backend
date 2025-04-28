@@ -11,12 +11,9 @@ import com.ChatSphere.Backend.Repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,10 +25,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordService passwordService;
     private final ModelMapper modelMapper;
-    private final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private final RedisService redisService;
 
-    public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) throws ParseException {
+    public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) {
         findByEmail(signUpRequest.getEmail()).ifPresent(user -> {
             throw new EmailAlreadyExistsException("Account already exists");
         });
@@ -133,7 +128,6 @@ public class UserService {
         } catch (Exception e) {
             log.error("Error processing password reset/update", e);
         }
-
         return false;
     }
 

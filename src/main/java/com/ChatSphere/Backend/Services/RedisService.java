@@ -3,6 +3,7 @@ package com.ChatSphere.Backend.Services;
 import com.ChatSphere.Backend.Config.RedisConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
@@ -11,7 +12,9 @@ import redis.clients.jedis.Jedis;
 @Slf4j
 public class RedisService {
     private final RedisConfig redisConfig;
-    private final String REDISKEY = "email:verification_code:";
+
+    @Value("${redis.redisVerificationKey}")
+    private String REDISKEY;
 
     public boolean addVerificationCodeToCache(String email, String code) {
         log.info("Adding verification code {} for {} to cache", email, code);
