@@ -13,7 +13,7 @@ import redis.clients.jedis.Jedis;
 public class RedisService {
     private final RedisConfig redisConfig;
 
-    @Value("${redis.REDIS_VERIFICATION_KEY}")
+    @Value("${redis.redisVerificationKey}")
     private String REDISKEY;
 
     public boolean addVerificationCodeToCache(String email, String code) {
