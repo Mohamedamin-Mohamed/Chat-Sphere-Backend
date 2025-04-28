@@ -1,4 +1,4 @@
 package com.ChatSphere.Backend.Dto;
 
-public class MessageResponseErrorDto {
+public record MessageResponseErrorDto(boolean success, String message) {
 }
