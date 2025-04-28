@@ -29,7 +29,7 @@ public class MessageService {
         }
     }
 
-    public List<Message> loadMessages() {
-        return messageRepository.findAll();
+    public List<Message> loadMessages(String email) {
+        return messageRepository.findMessageByEmail(email);
     }
 }
