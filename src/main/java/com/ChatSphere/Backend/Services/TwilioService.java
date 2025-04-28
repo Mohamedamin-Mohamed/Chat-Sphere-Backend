@@ -17,13 +17,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class TwilioService {
-    @Value("${twilio.STATUS_PENDING}")
+    @Value("${twilio.statusPending}")
     private String STATUS_PENDING;
 
-    @Value("${twilio.STATUS_APPROVED}")
+    @Value("${twilio.statusApproved}")
     private String STATUS_APPROVED;
 
-    @Value("${twilio.VERIFICATION_SID}")
+    @Value("${twilio.verificationSID}")
     private String SERVICE_ID;
 
     private final TwilioConfig twilioConfig;
