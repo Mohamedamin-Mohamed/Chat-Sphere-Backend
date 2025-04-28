@@ -1,8 +1,7 @@
 package com.ChatSphere.Backend.Mappers;
 
-import com.ChatSphere.Backend.Dto.OAuthSignUpRequestDto;
-import com.ChatSphere.Backend.Dto.SignUpRequestDto;
-import com.ChatSphere.Backend.Dto.UserDto;
+import com.ChatSphere.Backend.Dto.*;
+import com.ChatSphere.Backend.Model.Message;
 import com.ChatSphere.Backend.Model.User;
 import com.ChatSphere.Backend.Services.PasswordService;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +50,24 @@ public class ModelMapper {
         String formattedDate = dateTimeFormatter.format(user.getCreatedAt());
         userDto.setCreatedAt(formattedDate);
         return userDto;
+    }
+
+    public Message map(MessageRequestDto messageRequestDto) {
+        Message message = new Message();
+        message.setEmail(messageRequestDto.getEmail());
+        message.setSender(messageRequestDto.getSender());
+        message.setMessage(messageRequestDto.getMessage());
+        message.setTimestamp(messageRequestDto.getTimestamp());
+        return message;
+    }
+
+    public MessageResponseDto map(Message message) {
+        MessageResponseDto messageResponseDto = new MessageResponseDto();
+        messageResponseDto.setMessageId(String.valueOf(message.getMessageID()));
+        messageResponseDto.setEmail(message.getEmail());
+        messageResponseDto.setSender(message.getSender());
+        messageResponseDto.setMessage(message.getMessage());
+        messageResponseDto.setTimestamp(message.getTimestamp());
+        return messageResponseDto;
     }
 }
