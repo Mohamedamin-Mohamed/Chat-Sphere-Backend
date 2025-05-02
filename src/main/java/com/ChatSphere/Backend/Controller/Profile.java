@@ -1,4 +1,4 @@
-package com.ChatSphere.Backend.Controllers;
+package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.UpdateProfileDto;
 import com.ChatSphere.Backend.Dto.UserDto;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class Profile {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateProfile(@RequestBody @Valid UpdateProfileDto updateProfileDto) throws ParseException {
+    public ResponseEntity<Object> updateProfile(@RequestBody @Valid UpdateProfileDto updateProfileDto) {
         log.info("Updating profile for {}: ", updateProfileDto.getEmail());
 
         UserDto userDto = userService.updateProfile(updateProfileDto);
@@ -38,7 +37,6 @@ public class Profile {
         response.put("message", profileUpdated ? "Profile has been updated successfully" : "Profile update failed");
         System.out.println(response);
         return new ResponseEntity<>(response, profileUpdated ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
-
     }
 
 }
