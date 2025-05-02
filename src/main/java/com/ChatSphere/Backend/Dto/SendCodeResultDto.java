@@ -1,11 +1,9 @@
 package com.ChatSphere.Backend.Dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@Data
-@RequiredArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
 public class SendCodeResultDto {
     private boolean success;
