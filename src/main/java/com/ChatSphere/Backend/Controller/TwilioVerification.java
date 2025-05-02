@@ -1,4 +1,4 @@
-package com.ChatSphere.Backend.Controllers;
+package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.ApiResponseDto;
 import com.ChatSphere.Backend.Dto.SendCodeResultDto;
@@ -23,7 +23,7 @@ public class TwilioVerification {
 
     @PostMapping("/send")
     public ResponseEntity<ApiResponseDto> codeSending(@RequestBody TwilioSendPinDto sendPinDto) {
-        log.info("Sending code for phone number: {}", sendPinDto.getPhoneNumber());
+        log.info("Sending code for phone number: {}", sendPinDto.phoneNumber());
 
         SendCodeResultDto result = twilioService.sendCode(sendPinDto);
 
