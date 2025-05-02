@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class UpdateProfileDto {
     @NotBlank(message = "Email is required")
     @Email(message = "Valid email is required")
