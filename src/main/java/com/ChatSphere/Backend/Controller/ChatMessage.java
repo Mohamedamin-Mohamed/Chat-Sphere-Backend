@@ -1,4 +1,4 @@
-package com.ChatSphere.Backend.Controllers;
+package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.MessageRequestDto;
 import com.ChatSphere.Backend.Model.Message;
