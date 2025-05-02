@@ -1,4 +1,4 @@
-package com.ChatSphere.Backend.Controllers;
+package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.PasswordResetDto;
 import com.ChatSphere.Backend.Dto.SignInDto;
@@ -30,7 +30,7 @@ public class SignIn {
     private final RedisService redisService;
 
     @PostMapping("signin/email")
-    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto) throws ParseException {
+    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto)  {
         log.info("Received request for {} to sign in", signInDto.getEmail());
         UserDto userDto = userService.signInWithEmail(signInDto);
         Map<String, Object> response = new HashMap<>();
