@@ -1,4 +1,4 @@
-package com.ChatSphere.Backend.Controllers;
+package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.OAuthSignUpRequestDto;
 import com.ChatSphere.Backend.Dto.SignUpRequestDto;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class SignUp {
     private final UserService userService;
 
     @PostMapping("/email")
-    public ResponseEntity<String> signUpWithEmail(@RequestBody SignUpRequestDto signUpRequest) throws ParseException {
+    public ResponseEntity<String> signUpWithEmail(@RequestBody SignUpRequestDto signUpRequest) {
         log.info("Received request for {} to sign up with email", signUpRequest.getEmail());
         UserDto userDto = userService.signUpWithEmail(signUpRequest);
         System.out.println("User dto is " + userDto);
@@ -38,11 +37,11 @@ public class SignUp {
     }
 
     @PostMapping("/oauth")
-    public ResponseEntity<Object> signUpWithOauth(@RequestBody OAuthSignUpRequestDto oAuthSignUpRequest) throws ParseException {
+    public ResponseEntity<Object> signUpWithOauth(@RequestBody OAuthSignUpRequestDto oAuthSignUpRequest) {
         log.info("Received request for {} to sign up with oauth provider {}", oAuthSignUpRequest.getEmail(), oAuthSignUpRequest.getOauthProvider());
         if (oAuthSignUpRequest.getOauthProvider().equals("Apple")) {
-            /*if this is true it means it not the first time using is signing in with Apple so apple won't return users
-            email again on subsequent logins. In this case link the stored user oauth id with the request's oauth id. */
+            /* if this is true it means it not the first time using is signing in with Apple so apple won't return users
+             * email again on subsequent logins. In this case link the stored user oauth id with the request's oauth id. */
             if (oAuthSignUpRequest.getEmail() == null) {
                 log.info("Linking {} apple account with oauth id", oAuthSignUpRequest.getName());
                 User user = userService.findByOauthId(oAuthSignUpRequest.getOauthId());

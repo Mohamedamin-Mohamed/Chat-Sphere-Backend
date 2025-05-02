@@ -1,9 +1,6 @@
 package com.ChatSphere.Backend.Advicers;
 
-import com.ChatSphere.Backend.Exceptions.EmailAlreadyExistsException;
-import com.ChatSphere.Backend.Exceptions.EmailNotFoundException;
-import com.ChatSphere.Backend.Exceptions.IncorrectPasswordException;
-import com.ChatSphere.Backend.Exceptions.OAuthSignInRequiredException;
+import com.ChatSphere.Backend.Exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,5 +31,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleOauthSignInException(OAuthSignInRequiredException exp) {
         return new ResponseEntity<>(exp.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DocumentNotIndexed.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleDocumentNotIndexedException(DocumentNotIndexed exp) {
+        return new ResponseEntity<>(exp.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(EmbeddingNotCreated.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleEmbeddingNotCreatedException(EmbeddingNotCreated exp) {
+        return new ResponseEntity<>(exp.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

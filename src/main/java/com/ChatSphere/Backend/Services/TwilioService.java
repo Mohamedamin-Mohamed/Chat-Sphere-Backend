@@ -34,7 +34,7 @@ public class TwilioService {
         try {
             twilioConfig.connect();
 
-            String phoneNum = sendPinDto.getPhoneNumber();
+            String phoneNum = sendPinDto.phoneNumber();
             PhoneNumber number = PhoneNumber
                     .fetcher(new com.twilio.type.PhoneNumber(phoneNum))
                     .fetch();
@@ -50,7 +50,7 @@ public class TwilioService {
                 return new SendCodeResultDto(false, "Invalid phone number.");
             }
         } catch (Exception exp) {
-            log.error("Failed to send verification code to {}: {}", sendPinDto.getPhoneNumber(), exp.getMessage(), exp);
+            log.error("Failed to send verification code to {}: {}", sendPinDto.phoneNumber(), exp.getMessage(), exp);
             return new SendCodeResultDto(false, exp.getMessage());
         }
     }
@@ -59,24 +59,24 @@ public class TwilioService {
         try {
             twilioConfig.connect();
 
-            VerificationCheck verificationCheck = VerificationCheck.creator(SERVICE_ID, verifyPinDto.getPin())
-                    .setTo(verifyPinDto.getPhoneNumber())
+            VerificationCheck verificationCheck = VerificationCheck.creator(SERVICE_ID, verifyPinDto.pin())
+                    .setTo(verifyPinDto.phoneNumber())
                     .create();
 
             boolean isApproved = STATUS_APPROVED.equals(verificationCheck.getStatus());
             if (isApproved) {
                 UpdateProfileDto updateProfileDto = new UpdateProfileDto();
-                updateProfileDto.setEmail(verifyPinDto.getEmail());
-                updateProfileDto.setPhoneNumber(verifyPinDto.getPhoneNumber());
+                updateProfileDto.setEmail(verifyPinDto.email());
+                updateProfileDto.setPhoneNumber(verifyPinDto.phoneNumber());
                 userService.updateProfile(updateProfileDto);
                 return true;
             }
 
-            log.info("Verification status for {} is {}", verifyPinDto.getPhoneNumber(), verificationCheck.getStatus());
+            log.info("Verification status for {} is {}", verifyPinDto.phoneNumber(), verificationCheck.getStatus());
             return false;
 
         } catch (Exception exp) {
-            log.error("Verification failed for {}: {}", verifyPinDto.getPhoneNumber(), exp.getMessage(), exp);
+            log.error("Verification failed for {}: {}", verifyPinDto.phoneNumber(), exp.getMessage(), exp);
             return false;
         }
     }

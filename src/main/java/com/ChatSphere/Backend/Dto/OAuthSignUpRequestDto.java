@@ -1,8 +1,10 @@
 package com.ChatSphere.Backend.Dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class OAuthSignUpRequestDto {
     private String email;
     private String name;

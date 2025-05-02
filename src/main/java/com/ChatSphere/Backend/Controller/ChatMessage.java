@@ -1,4 +1,4 @@
-package com.ChatSphere.Backend.Controllers;
+package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.MessageRequestDto;
 import com.ChatSphere.Backend.Model.Message;
@@ -21,14 +21,14 @@ public class ChatMessage {
     @PostMapping("/create")
     private ResponseEntity<Object> saveMessage(@RequestBody MessageRequestDto messageDto) {
         log.info("Saving new message for sender  {}", messageDto.getSender());
-        log.info("Message is {}", messageDto);
         Object response = messageService.saveMessage(messageDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/messages")
-    public ResponseEntity<List<Message>> loadMessages() {
-        List<Message> messages = messageService.loadMessages();
+    public ResponseEntity<List<Message>> loadMessages(@RequestParam String email) {
+        log.info("Loading messages for {}", email);
+        List<Message> messages = messageService.loadMessages(email);
         if (messages != null) {
             return new ResponseEntity<>(messages, HttpStatus.OK);
         }

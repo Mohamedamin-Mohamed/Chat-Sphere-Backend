@@ -1,8 +1,10 @@
 package com.ChatSphere.Backend.Dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class MailjetDto {
     private String recipientEmail;
     private String subject;

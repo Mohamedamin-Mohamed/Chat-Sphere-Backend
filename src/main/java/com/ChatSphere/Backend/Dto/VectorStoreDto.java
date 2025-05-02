@@ -2,12 +2,14 @@ package com.ChatSphere.Backend.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class SignInDto {
-    private String email;
-    private String password;
+@NoArgsConstructor
+public class VectorStoreDto {
+    private EmbeddingDto embeddingDto;
+    private float[] embeddings;
 }
