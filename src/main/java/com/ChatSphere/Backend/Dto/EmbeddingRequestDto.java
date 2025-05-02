@@ -1,4 +1,4 @@
 package com.ChatSphere.Backend.Dto;
 
-public class CreateEmbeddingDto {
+public record EmbeddingRequestDto(String question) {
 }
