@@ -19,6 +19,5 @@ public class UpdateProfileDto {
 
     private String name;
     private String bio;
-    private String profileImage;
     private String phoneNumber;
 }
