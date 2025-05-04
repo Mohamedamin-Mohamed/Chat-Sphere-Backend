@@ -7,13 +7,12 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -27,10 +26,11 @@ public class Profile {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateProfile(@RequestBody @Valid UpdateProfileDto updateProfileDto) {
+    public ResponseEntity<Object> updateProfile(@ModelAttribute @Valid UpdateProfileDto updateProfileDto,
+                                                @RequestPart(value = "profilePictureDetails", required = false) MultipartFile multipartFile) {
         log.info("Updating profile for {}: ", updateProfileDto.getEmail());
 
-        UserDto userDto = userService.updateProfile(updateProfileDto);
+        UserDto userDto = userService.updateProfile(updateProfileDto, multipartFile == null ? Optional.empty() : Optional.of(multipartFile));
         boolean profileUpdated = userDto != null;
         Map<String, Object> response = new HashMap<>();
         response.put("user", userDto);
