@@ -40,8 +40,8 @@ public class SignUp {
     public ResponseEntity<Object> signUpWithOauth(@RequestBody OAuthSignUpRequestDto oAuthSignUpRequest) {
         log.info("Received request for {} to sign up with oauth provider {}", oAuthSignUpRequest.getEmail(), oAuthSignUpRequest.getOauthProvider());
         if (oAuthSignUpRequest.getOauthProvider().equals("Apple")) {
-            /* if this is true it means it not the first time using is signing in with Apple so apple won't return users
-             * email again on subsequent logins. In this case link the stored user oauth id with the request's oauth id. */
+            /*if this is true it means it not the first time using is signing in with Apple so apple won't return users
+            email again on subsequent logins. In this case link the stored user oauth id with the request's oauth id. */
             if (oAuthSignUpRequest.getEmail() == null) {
                 log.info("Linking {} apple account with oauth id", oAuthSignUpRequest.getName());
                 User user = userService.findByOauthId(oAuthSignUpRequest.getOauthId());
