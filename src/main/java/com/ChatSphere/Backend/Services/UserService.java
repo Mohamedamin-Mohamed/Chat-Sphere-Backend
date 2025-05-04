@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordService passwordService;
     private final ModelMapper modelMapper;
+    private final FilesUploadService filesUploadService;
 
     public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) {
         findByEmail(signUpRequest.getEmail()).ifPresent(user -> {
@@ -136,16 +138,16 @@ public class UserService {
         user.ifPresent(userRepository::delete);
     }
 
-    public UserDto updateProfile(UpdateProfileDto updateProfileDto) {
+    public UserDto updateProfile(UpdateProfileDto updateProfileDto, Optional<MultipartFile> multipartFile) {
         User user = findByEmail(updateProfileDto.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
-        // Check if email is being changed
+        // check if email is being changed
         String currentEmail = user.getEmail();
         String newEmail = updateProfileDto.getNewEmail();
 
         if (newEmail != null && !newEmail.isEmpty() && !currentEmail.equals(newEmail)) {
-            // Check if the new email is already taken by another user
+            // check if the new email is already taken by another user
             findByEmail(newEmail).ifPresent(existingUser -> {
                 if (existingUser.getId() != user.getId()) {
                     throw new EmailAlreadyExistsException("Email already in use.");
@@ -163,9 +165,11 @@ public class UserService {
             user.setBio(updateProfileDto.getBio());
         }
 
-        if (updateProfileDto.getProfileImage() != null) {
-            //in here implement s3 file upload logic and store the public url
-            user.setPicture(updateProfileDto.getProfileImage());
+        if (multipartFile.isPresent()) {
+            String publicFileUrl = filesUploadService.uploadFileToS3Bucket(multipartFile.orElse(null));
+            if (publicFileUrl != null && !publicFileUrl.isEmpty()) {
+                user.setPicture(publicFileUrl);
+            }
         }
 
         if (updateProfileDto.getPhoneNumber() != null) {

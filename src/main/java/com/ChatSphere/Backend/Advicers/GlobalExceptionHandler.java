@@ -44,4 +44,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEmbeddingNotCreatedException(EmbeddingNotCreated exp) {
         return new ResponseEntity<>(exp.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ChatCompletionsNotCreated.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleChatCompletionsNotCreated(ChatCompletionsNotCreated exp) {
+        return new ResponseEntity<>(exp.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
