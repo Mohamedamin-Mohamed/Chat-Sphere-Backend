@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -68,7 +70,7 @@ public class TwilioService {
                 UpdateProfileDto updateProfileDto = new UpdateProfileDto();
                 updateProfileDto.setEmail(verifyPinDto.email());
                 updateProfileDto.setPhoneNumber(verifyPinDto.phoneNumber());
-                userService.updateProfile(updateProfileDto);
+                userService.updateProfile(updateProfileDto, Optional.empty());
                 return true;
             }
 
