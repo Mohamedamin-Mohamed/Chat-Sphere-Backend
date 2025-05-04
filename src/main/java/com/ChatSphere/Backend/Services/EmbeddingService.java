@@ -45,12 +45,12 @@ public class EmbeddingService {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonBody = objectMapper.writeValueAsString(requestBody);
 
-            HttpRequest headers = HttpRequest.newBuilder().
+            HttpRequest httpRequest = HttpRequest.newBuilder().
                     uri(URI.create(embeddingUrl)).
-                    headers("Content-Type", "application/json").
+                    header("Content-type", "application/json").
                     header("Authorization", "Bearer " + apiKey).
                     POST(HttpRequest.BodyPublishers.ofString(jsonBody)).build();
-            HttpResponse<String> httpResponse = httpClient.send(headers, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (httpResponse.statusCode() != 200) {
                 throw new EmbeddingNotCreated("Error occurred when creating embedding");
