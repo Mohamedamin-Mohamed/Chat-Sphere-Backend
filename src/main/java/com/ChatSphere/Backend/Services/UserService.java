@@ -6,6 +6,7 @@ import com.ChatSphere.Backend.Exceptions.EmailNotFoundException;
 import com.ChatSphere.Backend.Exceptions.IncorrectPasswordException;
 import com.ChatSphere.Backend.Exceptions.OAuthSignInRequiredException;
 import com.ChatSphere.Backend.Mappers.ModelMapper;
+import com.ChatSphere.Backend.Model.Follow;
 import com.ChatSphere.Backend.Model.User;
 import com.ChatSphere.Backend.Repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,11 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
@@ -27,10 +28,12 @@ public class UserService {
     private final PasswordService passwordService;
     private final ModelMapper modelMapper;
     private final FilesUploadService filesUploadService;
+    private final FollowService followService;
 
+    @Transactional
     public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) {
         findByEmail(signUpRequest.getEmail()).ifPresent(user -> {
-            throw new EmailAlreadyExistsException("Account already exists");
+            throw new EmailAlreadyExistsException("Email already exists");
         });
 
         User user = modelMapper.map(signUpRequest);
@@ -39,6 +42,7 @@ public class UserService {
         return modelMapper.map(user);
     }
 
+    @Transactional
     public UserDto signUpWithOauth(OAuthSignUpRequestDto oAuthSignUpRequest) {
         Optional<User> existingUser = findByEmail(oAuthSignUpRequest.getEmail());
         if (existingUser.isPresent()) {
@@ -82,6 +86,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    @Transactional
     public boolean resetPassword(Object genericObject) {
         User user = null;
 
@@ -138,6 +143,7 @@ public class UserService {
         user.ifPresent(userRepository::delete);
     }
 
+    @Transactional
     public UserDto updateProfile(UpdateProfileDto updateProfileDto, Optional<MultipartFile> multipartFile) {
         User user = findByEmail(updateProfileDto.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("Email not found"));
@@ -177,7 +183,37 @@ public class UserService {
         }
 
         userRepository.save(user);
-
         return modelMapper.map(user);
+    }
+
+    public List<UserSearchDto> searchUsers(SearchRequest searchRequest) {
+        try {
+            List<User> users = userRepository.searchUsersByNameOrEmail(searchRequest.query(), searchRequest.requesterEmail());
+            return users.stream().map(user -> modelMapper.map(user, followsUser(searchRequest.requesterEmail(), user), constructFollowingUser(searchRequest, user))).toList();
+        } catch (Exception exp) {
+            log.error("Something went wrong: ", exp);
+            return null;
+        }
+    }
+
+    public boolean constructFollowingUser(SearchRequest searchRequest, User user) {
+        User followingUser = findByEmail(searchRequest.requesterEmail()).orElseThrow(() -> new EmailNotFoundException("Following email not found"));
+        return followsUser(user.getEmail(), followingUser);
+    }
+
+    public boolean followsUser(String requesterEmail, User targetUser) {
+        User requester = findByEmail(requesterEmail).orElseThrow(() -> new EmailNotFoundException("Requester email not found"));
+        List<Follow> followList = followService.findByFollower(requester);
+
+        return followList.stream().anyMatch(f -> f.getFollowing().getId() == targetUser.getId());
+    }
+
+    public UserStatsDto getUserStats(String email) {
+        User user = findByEmail(email).orElseThrow(() -> new EmailNotFoundException("User email was not found"));
+
+        List<Follow> followingList = user.getFollowers();
+        List<Follow> followerList = user.getFollowings();
+
+        return modelMapper.map(followerList, followingList);
     }
 }
