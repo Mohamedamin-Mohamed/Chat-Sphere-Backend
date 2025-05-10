@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("api/chat")
 @RequiredArgsConstructor
-public class Conversation {
+public class ConversationController {
     private final ConversationService conversationService;
 
     @PostMapping("/completions")

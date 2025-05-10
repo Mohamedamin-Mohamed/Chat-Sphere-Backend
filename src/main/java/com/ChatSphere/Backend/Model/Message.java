@@ -22,6 +22,7 @@ public class Message {
     @NonNull
     private String sender;
     @NonNull
+    @Column(length = 500)
     private String message;
     @NonNull
     private String timestamp;

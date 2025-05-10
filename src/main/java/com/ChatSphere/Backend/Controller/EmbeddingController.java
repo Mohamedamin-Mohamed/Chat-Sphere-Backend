@@ -19,15 +19,15 @@ import java.util.List;
 @RequestMapping("api/embeddings")
 @Slf4j
 @RequiredArgsConstructor
-public class Embedding {
+public class EmbeddingController {
 
     private final EmbeddingService embeddingService;
 
     @PostMapping
-    public ResponseEntity.BodyBuilder createEmbedding(@RequestBody EmbeddingDto embeddingDto) throws IOException {
+    public ResponseEntity<?> createEmbedding(@RequestBody EmbeddingDto embeddingDto) throws IOException {
         log.info("Creating embedding for question {}", embeddingDto.getQuestion());
         embeddingService.storeEmbeddings(embeddingDto);
-        return ResponseEntity.ok();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/search")

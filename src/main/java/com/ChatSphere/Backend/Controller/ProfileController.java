@@ -17,11 +17,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/profile")
 @Slf4j
-public class Profile {
+public class ProfileController {
 
     private final UserService userService;
 
-    public Profile(UserService userService) {
+    public ProfileController(UserService userService) {
         this.userService = userService;
     }
 

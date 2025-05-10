@@ -1,14 +1,17 @@
 package com.ChatSphere.Backend.Mappers;
 
 import com.ChatSphere.Backend.Dto.*;
+import com.ChatSphere.Backend.Model.Follow;
 import com.ChatSphere.Backend.Model.Message;
 import com.ChatSphere.Backend.Model.User;
 import com.ChatSphere.Backend.Services.PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +49,14 @@ public class ModelMapper {
         userDto.setBio(user.getBio());
         userDto.setPhoneNumber(user.getPhoneNumber());
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM yyy").withZone(ZoneId.systemDefault());
-        String formattedDate = dateTimeFormatter.format(user.getCreatedAt());
+        String formattedDate = formatedDate(user.getCreatedAt());
         userDto.setCreatedAt(formattedDate);
         return userDto;
+    }
+
+    public String formatedDate(Instant instant) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM yyy").withZone(ZoneId.systemDefault());
+        return dateTimeFormatter.format(instant);
     }
 
     public Message map(MessageRequestDto messageRequestDto) {
@@ -69,5 +76,34 @@ public class ModelMapper {
         messageResponseDto.setMessage(message.getMessage());
         messageResponseDto.setTimestamp(message.getTimestamp());
         return messageResponseDto;
+    }
+
+    public Follow map(User follower, User following) {
+        Follow follow = new Follow();
+        follow.setFollower(follower);
+        follow.setFollowing(following);
+        return follow;
+    }
+
+    public UserSearchDto map(User user, boolean isFollowedByRequester, boolean isFollowingRequester) {
+        UserSearchDto userSearchDto = new UserSearchDto();
+        userSearchDto.setEmail(user.getEmail());
+        userSearchDto.setName(user.getName());
+        userSearchDto.setBio(user.getBio());
+        userSearchDto.setPicture(user.getPicture());
+        userSearchDto.setJoinedDate(formatedDate(user.getCreatedAt()));
+        userSearchDto.setOnline(false);
+        userSearchDto.setFollowerSize(user.getFollowers().size());
+        userSearchDto.setFollowingSize(user.getFollowings().size());
+        userSearchDto.setFollowedByRequester(isFollowedByRequester);
+        userSearchDto.setFollowingRequester(isFollowingRequester);
+        return userSearchDto;
+    }
+
+    public UserStatsDto map(List<Follow> followList, List<Follow> followingList) {
+        UserStatsDto userStatsDto = new UserStatsDto();
+        userStatsDto.setFollowers(followingList.size());
+        userStatsDto.setFollowings(followList.size());
+        return userStatsDto;
     }
 }

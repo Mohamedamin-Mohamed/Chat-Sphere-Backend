@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/twilio/code")
 @RequiredArgsConstructor
 @Slf4j
-public class TwilioVerification {
+public class TwilioVerificationController {
     private final TwilioService twilioService;
 
     @PostMapping("/send")

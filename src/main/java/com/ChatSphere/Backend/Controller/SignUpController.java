@@ -21,7 +21,7 @@ import java.util.Map;
 @RequestMapping("/auth/signup")
 @RequiredArgsConstructor
 @Slf4j
-public class SignUp {
+public class SignUpController {
 
     private final UserService userService;
 

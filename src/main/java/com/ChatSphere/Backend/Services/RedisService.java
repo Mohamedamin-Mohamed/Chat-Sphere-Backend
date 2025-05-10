@@ -16,6 +16,7 @@ public class RedisService {
     @Value("${redis.redisVerificationKey}")
     private String REDISKEY;
 
+
     public boolean addVerificationCodeToCache(String email, String code) {
         log.info("Adding verification code {} for {} to cache", email, code);
         try (Jedis jedis = redisConfig.connect()) {
