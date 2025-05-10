@@ -6,10 +6,10 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "Followers", uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "following_id"}))
+@Table(name = "Follows", uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "following_id"}))
 @Getter
 @Setter
-public class Follower {
+public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
