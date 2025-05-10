@@ -11,23 +11,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/follows")
+@RequestMapping("api/follow")
 @Slf4j
 @RequiredArgsConstructor
-public class Follow {
+public class FollowController {
     private final FollowService followService;
 
-    @PostMapping("/follow")
-    public ResponseEntity.BodyBuilder followUser(@RequestBody FollowFollowingRequest followFollowingRequest) {
+    @PostMapping("/add")
+    public ResponseEntity<?> followUser(@RequestBody FollowFollowingRequest followFollowingRequest) {
         log.info("Received follow request from {} to follow {}.", followFollowingRequest.followerEmail(), followFollowingRequest.followingEmail());
         followService.followUser(followFollowingRequest);
-        return ResponseEntity.ok();
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/unfollow")
-    public ResponseEntity.BodyBuilder unfollowUser(@RequestBody FollowFollowingRequest followFollowingRequest) {
+    @PostMapping("/remove")
+    public ResponseEntity<?> unfollowUser(@RequestBody FollowFollowingRequest followFollowingRequest) {
         log.info("Received unfollow request from {} to unfollow {}.", followFollowingRequest.followerEmail(), followFollowingRequest.followingEmail());
         followService.unfollowUser(followFollowingRequest);
-        return ResponseEntity.ok();
+        return ResponseEntity.ok().build();
     }
 }
