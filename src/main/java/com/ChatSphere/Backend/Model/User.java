@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "Users")
@@ -46,4 +47,11 @@ public class User {
     private String bio;
     private String phoneNumber;
     private String identityToken;
+
+
+    @OneToMany(mappedBy = "following")
+    private List<Follow> followers;
+
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> followings;
 }
