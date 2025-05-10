@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,14 +22,14 @@ import java.util.Map;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
-public class SignIn {
+public class SignInController {
     private final UserService userService;
     private final CodeGeneratorService codeGeneratorService;
     private final EmailService emailService;
     private final RedisService redisService;
 
     @PostMapping("signin/email")
-    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto)  {
+    public ResponseEntity<Object> signInWithEmail(@RequestBody SignInDto signInDto) {
         log.info("Received request for {} to sign in", signInDto.getEmail());
         UserDto userDto = userService.signInWithEmail(signInDto);
         Map<String, Object> response = new HashMap<>();

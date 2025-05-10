@@ -15,12 +15,12 @@ import java.util.List;
 @RequestMapping("auth/message")
 @RequiredArgsConstructor
 @Slf4j
-public class ChatMessage {
+public class ChatMessageController {
     private final MessageService messageService;
 
     @PostMapping("/create")
     private ResponseEntity<Object> saveMessage(@RequestBody MessageRequestDto messageDto) {
-        log.info("Saving new message for sender  {}", messageDto.getSender());
+        log.info("Saving new message for sender  {} {}", messageDto.getSender(), messageDto.getMessage().length());
         Object response = messageService.saveMessage(messageDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

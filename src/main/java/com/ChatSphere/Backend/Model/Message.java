@@ -11,7 +11,7 @@ import java.util.UUID;
 @Table(name = "Messages")
 @Getter
 @Setter
-public class Message {
+public class Messages {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID messageID;
@@ -22,6 +22,7 @@ public class Message {
     @NonNull
     private String sender;
     @NonNull
+    @Column(length = 500)
     private String message;
     @NonNull
     private String timestamp;
