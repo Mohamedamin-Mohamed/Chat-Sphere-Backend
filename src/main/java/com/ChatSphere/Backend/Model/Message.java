@@ -11,7 +11,7 @@ import java.util.UUID;
 @Table(name = "Messages")
 @Getter
 @Setter
-public class Messages {
+public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID messageID;
