@@ -6,6 +6,7 @@ import com.ChatSphere.Backend.Exceptions.EmailNotFoundException;
 import com.ChatSphere.Backend.Exceptions.IncorrectPasswordException;
 import com.ChatSphere.Backend.Exceptions.OAuthSignInRequiredException;
 import com.ChatSphere.Backend.Mappers.ModelMapper;
+import com.ChatSphere.Backend.Mappers.UserSearchDTOMapper;
 import com.ChatSphere.Backend.Model.Follow;
 import com.ChatSphere.Backend.Model.User;
 import com.ChatSphere.Backend.Repositories.UserRepository;
@@ -28,7 +29,7 @@ public class UserService {
     private final PasswordService passwordService;
     private final ModelMapper modelMapper;
     private final FilesUploadService filesUploadService;
-    private final FollowService followService;
+    private final UserSearchDTOMapper userSearchDTOMapper;
 
     @Transactional
     public UserDto signUpWithEmail(SignUpRequestDto signUpRequest) {
@@ -189,24 +190,13 @@ public class UserService {
     public List<UserSearchDto> searchUsers(SearchRequest searchRequest) {
         try {
             List<User> users = userRepository.searchUsersByNameOrEmail(searchRequest.query(), searchRequest.requesterEmail());
-            return users.stream().map(user -> modelMapper.map(user, followsUser(searchRequest.requesterEmail(), user), constructFollowingUser(searchRequest, user))).toList();
+            return users.stream().map(user -> userSearchDTOMapper.map(user, searchRequest)).toList();
         } catch (Exception exp) {
             log.error("Something went wrong: ", exp);
             return null;
         }
     }
 
-    public boolean constructFollowingUser(SearchRequest searchRequest, User user) {
-        User followingUser = findByEmail(searchRequest.requesterEmail()).orElseThrow(() -> new EmailNotFoundException("Following email not found"));
-        return followsUser(user.getEmail(), followingUser);
-    }
-
-    public boolean followsUser(String requesterEmail, User targetUser) {
-        User requester = findByEmail(requesterEmail).orElseThrow(() -> new EmailNotFoundException("Requester email not found"));
-        List<Follow> followList = followService.findByFollower(requester);
-
-        return followList.stream().anyMatch(f -> f.getFollowing().getId() == targetUser.getId());
-    }
 
     public UserStatsDto getUserStats(String email) {
         User user = findByEmail(email).orElseThrow(() -> new EmailNotFoundException("User email was not found"));
