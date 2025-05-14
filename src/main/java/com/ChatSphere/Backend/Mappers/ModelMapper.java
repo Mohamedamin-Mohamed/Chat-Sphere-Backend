@@ -41,17 +41,17 @@ public class ModelMapper {
     }
 
     public UserDto map(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setEmail(user.getEmail());
-        userDto.setName(user.getName());
-        userDto.setOauthProvider(user.getOauthProvider());
-        userDto.setPicture(user.getPicture());
-        userDto.setBio(user.getBio());
-        userDto.setPhoneNumber(user.getPhoneNumber());
 
-        String formattedDate = formatedDate(user.getCreatedAt());
-        userDto.setCreatedAt(formattedDate);
-        return userDto;
+        return new UserDto.
+                Builder().
+                email(user.getEmail()).
+                createdAt(formatedDate(user.getCreatedAt())).
+                name(user.getName()).
+                oauthProvider(user.getOauthProvider()).
+                picture(user.getPicture()).
+                bio(user.getBio()).
+                phoneNumber(user.getPhoneNumber()).
+                build();
     }
 
     public String formatedDate(Instant instant) {
@@ -69,13 +69,14 @@ public class ModelMapper {
     }
 
     public MessageResponseDto map(Message message) {
-        MessageResponseDto messageResponseDto = new MessageResponseDto();
-        messageResponseDto.setMessageId(String.valueOf(message.getMessageID()));
-        messageResponseDto.setEmail(message.getEmail());
-        messageResponseDto.setSender(message.getSender());
-        messageResponseDto.setMessage(message.getMessage());
-        messageResponseDto.setTimestamp(message.getTimestamp());
-        return messageResponseDto;
+
+        return new MessageResponseDto.
+                Builder().messageId(String.valueOf(message.getMessageID())).
+                email(message.getEmail()).
+                sender(message.getSender()).
+                message(message.getMessage()).
+                timestamp(message.getTimestamp())
+                .build();
     }
 
     public Follow map(User follower, User following) {
@@ -86,18 +87,18 @@ public class ModelMapper {
     }
 
     public UserSearchDto map(User user, boolean isFollowedByRequester, boolean isFollowingRequester) {
-        UserSearchDto userSearchDto = new UserSearchDto();
-        userSearchDto.setEmail(user.getEmail());
-        userSearchDto.setName(user.getName());
-        userSearchDto.setBio(user.getBio());
-        userSearchDto.setPicture(user.getPicture());
-        userSearchDto.setJoinedDate(formatedDate(user.getCreatedAt()));
-        userSearchDto.setOnline(false);
-        userSearchDto.setFollowerSize(user.getFollowers().size());
-        userSearchDto.setFollowingSize(user.getFollowings().size());
-        userSearchDto.setFollowedByRequester(isFollowedByRequester);
-        userSearchDto.setFollowingRequester(isFollowingRequester);
-        return userSearchDto;
+
+        return new UserSearchDto.
+                Builder(user.getName(), user.getEmail()).
+                bio(user.getBio()).
+                picture(user.getPicture()).
+                joinedDate(formatedDate(user.getCreatedAt())).
+                isOnline(false).
+                followerSize(user.getFollowers().size()).
+                followingSize(user.getFollowings().size()).
+                isFollowedByRequester(isFollowedByRequester).
+                isFollowingRequester(isFollowingRequester).
+                build();
     }
 
     public UserStatsDto map(List<Follow> followList, List<Follow> followingList) {
