@@ -32,7 +32,7 @@ public class OpenSearchService {
 
     private final OpenSearchClient client;
 
-    public void indexEmbeddings(EmbeddingDto embeddingDto, float[] embedding) throws IOException {
+    public void indexEmbeddings(EmbeddingDto embeddingDto, float[] embedding) {
         try {
             VectorStoreDto vectorStoreDto = getVectorStoreEquivalent(embeddingDto, embedding);
             IndexRequest<VectorStoreDto> indexRequest = new IndexRequest.Builder<VectorStoreDto>().
@@ -49,10 +49,10 @@ public class OpenSearchService {
         }
     }
 
-    public VectorStoreDto getVectorStoreEquivalent(EmbeddingDto embeddingDto, float[] embeddings_vector) {
+    public VectorStoreDto getVectorStoreEquivalent(EmbeddingDto embeddingDto, float[] embeddingsVector) {
         VectorStoreDto vectorStoreDto = new VectorStoreDto();
         vectorStoreDto.setEmbeddingDto(embeddingDto);
-        vectorStoreDto.setEmbeddings(embeddings_vector);
+        vectorStoreDto.setEmbeddings(embeddingsVector);
         return vectorStoreDto;
     }
 
