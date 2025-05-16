@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -187,16 +188,15 @@ public class UserService {
         return modelMapper.map(user);
     }
 
-    public List<UserSearchDto> searchUsers(SearchRequest searchRequest) {
+    public List<UserSearchDTO> searchUsers(SearchRequest searchRequest) {
         try {
             List<User> users = userRepository.searchUsersByNameOrEmail(searchRequest.query(), searchRequest.requesterEmail());
-            return users.stream().map(user -> userSearchDTOMapper.map(user, searchRequest)).toList();
+            return users.stream().map(user -> userSearchDTOMapper.apply(user, searchRequest.requesterEmail())).toList();
         } catch (Exception exp) {
             log.error("Something went wrong: ", exp);
-            return null;
+            return Collections.emptyList();
         }
     }
-
 
     public UserStatsDto getUserStats(String email) {
         User user = findByEmail(email).orElseThrow(() -> new EmailNotFoundException("User email was not found"));

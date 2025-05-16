@@ -3,9 +3,11 @@ package com.ChatSphere.Backend.Dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class UserSearchDto {
+public class UserSearchDTO {
     private String email;
     private String name;
     private String bio;
@@ -16,8 +18,10 @@ public class UserSearchDto {
     private int followingSize;
     private boolean isFollowedByRequester;
     private boolean isFollowingRequester;
+    private int mutualFriendsSize;
+    private List<UserSearchDTO> topThreeMutualFriends;
 
-    private UserSearchDto(Builder builder) {
+    private UserSearchDTO(Builder builder) {
         this.email = builder.email;
         this.name = builder.name;
         this.bio = builder.bio;
@@ -28,6 +32,8 @@ public class UserSearchDto {
         this.followingSize = builder.followingSize;
         this.isFollowedByRequester = builder.isFollowedByRequester;
         this.isFollowingRequester = builder.isFollowingRequester;
+        this.mutualFriendsSize = builder.mutualFriendsSize;
+        this.topThreeMutualFriends = builder.topThreeMutualFriends;
     }
 
     public static class Builder {
@@ -41,6 +47,8 @@ public class UserSearchDto {
         private int followingSize;
         private boolean isFollowedByRequester;
         private boolean isFollowingRequester;
+        private int mutualFriendsSize;
+        private List<UserSearchDTO> topThreeMutualFriends;
 
         public Builder(String name, String email) {
             this.name = name;
@@ -87,8 +95,18 @@ public class UserSearchDto {
             return this;
         }
 
-        public UserSearchDto build() {
-            return new UserSearchDto(this);
+        public Builder mutualFriendsSize(int mutualFriendsSize) {
+            this.mutualFriendsSize = mutualFriendsSize;
+            return this;
+        }
+
+        public Builder topThreeMutualFriends(List<UserSearchDTO> topThreeMutualFriends) {
+            this.topThreeMutualFriends = topThreeMutualFriends;
+            return this;
+        }
+
+        public UserSearchDTO build() {
+            return new UserSearchDTO(this);
         }
     }
 

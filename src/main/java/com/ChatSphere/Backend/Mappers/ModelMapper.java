@@ -86,9 +86,18 @@ public class ModelMapper {
         return follow;
     }
 
-    public UserSearchDto map(User user, boolean isFollowedByRequester, boolean isFollowingRequester) {
 
-        return new UserSearchDto.
+    public UserSearchDTO map(UserSearchResponse userSearchResponse) {
+        User user = userSearchResponse.getUser();
+        boolean isFollowedByRequester = userSearchResponse.isRequesterFollowsUser();
+        boolean isFollowingRequester = userSearchResponse.isRequesterIsFollowed();
+        List<User> mutualFriends = userSearchResponse.getMutualFriendsList();
+
+        int mutualFriendsSize = mutualFriends.size();
+
+        List<UserSearchDTO> topThreeMutualFriends = userSearchResponse.getTopThreeMutualFriendsSearchDTOList();
+
+        return new UserSearchDTO.
                 Builder(user.getName(), user.getEmail()).
                 bio(user.getBio()).
                 picture(user.getPicture()).
@@ -98,6 +107,8 @@ public class ModelMapper {
                 followingSize(user.getFollowings().size()).
                 isFollowedByRequester(isFollowedByRequester).
                 isFollowingRequester(isFollowingRequester).
+                mutualFriendsSize(mutualFriendsSize).
+                topThreeMutualFriends(topThreeMutualFriends).
                 build();
     }
 

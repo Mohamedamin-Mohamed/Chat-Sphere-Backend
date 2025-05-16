@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -52,7 +51,7 @@ public class TwilioService {
                 return new SendCodeResultDto(false, "Invalid phone number.");
             }
         } catch (Exception exp) {
-            log.error("Failed to send verification code to {}: {}", sendPinDto.phoneNumber(), exp.getMessage(), exp);
+            log.error("Failed to send verification code to {}: {}", sendPinDto.phoneNumber(), exp.getMessage());
             return new SendCodeResultDto(false, exp.getMessage());
         }
     }

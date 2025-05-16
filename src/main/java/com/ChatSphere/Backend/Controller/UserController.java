@@ -1,7 +1,7 @@
 package com.ChatSphere.Backend.Controller;
 
 import com.ChatSphere.Backend.Dto.SearchRequest;
-import com.ChatSphere.Backend.Dto.UserSearchDto;
+import com.ChatSphere.Backend.Dto.UserSearchDTO;
 import com.ChatSphere.Backend.Dto.UserStatsDto;
 import com.ChatSphere.Backend.Services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class UserController {
     @GetMapping("/search")
     public ResponseEntity<Object> searchUsers(@RequestParam String requesterEmail, @RequestParam String query) {
         log.info("Searching for users with the query {} requested by {}.", query, requesterEmail);
-        List<UserSearchDto> userSearchDtoList = userService.searchUsers(new SearchRequest(requesterEmail, query));
+        List<UserSearchDTO> userSearchDtoList = userService.searchUsers(new SearchRequest(requesterEmail, query));
         return ResponseEntity.ok(userSearchDtoList);
     }
 
